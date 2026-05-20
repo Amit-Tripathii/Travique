@@ -1,5 +1,5 @@
 if (process.env.NODE_ENV !== 'production') {
-require('dotenv').config();
+require('dotenv').config({ quiet: true });
 }
 // require('dotenv').config();
 
@@ -28,17 +28,7 @@ const userRouter= require('./routes/user.js');
 
 
 const dbUrl = process.env.ATLASDB_URL;
-
-main()
-    .then(() => {
-        console.log('Connected to MongoDB');
-    })
-    .catch((err) => {
-        console.log('Error connecting to MongoDB', err);
-    });
-async function main() {
-    await mongoose.connect(dbUrl);
-}
+const secret = process.env.SECRET;
 
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
@@ -47,87 +37,94 @@ app.use(methodOverride('_method'));
 app.engine('ejs', ejsMate);
 app.use(express.static(path.join(__dirname, 'public')));
 
-const store = MongoStore.create({
-    mongoUrl: dbUrl,
-    touchAfter: 24 * 60 * 60, // time period in seconds
-    
-         secret: process.env.SECRET,
-    
-});
-
-store.on("error", function (e) {
-    console.log("SESSION STORE ERROR", e);
-});
-
-const sessionOptions = {
-     store,
-    secret: process.env.SECRET,
-    resave: false,
-    saveUninitialized: false,
-    cookie: {
-        httpOnly: true,
-        expires: Date.now() + 1000 * 60 * 60 * 24 * 7, // 1 week
-        maxAge: 1000 * 60 * 60 * 24 * 7
-    },
-};
-
-
-
 // app.get('/', (req, res) => {
 //     res.send('Hi I am root');
 // });
 
-app.use(session(sessionOptions));
-app.use(flash());
-
-app.use(passport.initialize());
-app.use(passport.session());
-passport.use(new LocalStrategy(User.authenticate()));
-
-passport.serializeUser(User.serializeUser());
-passport.deserializeUser(User.deserializeUser());
-
-app.use((req, res, next) => {
-    res.locals.success = req.flash('success');
-    // console.log(res.locals.success);
-    res.locals.error = req.flash('error');
-    res.locals.currUser = req.user;
-    next();
-});
-
-// app.get('/demoUser', async (req, res) => {
-//     const user = new User({
-//         email: 'demo@example.com',
-//         username: 'demoUser'
-//     });
-//     let registeredUser = await User.register(user, 'helloworld');
-//     res.send(registeredUser);
-// });
-
-
-
-
-app.use("/listings", listingRouter);
-app.use("/listings/:id/reviews", reviewRouter);
-app.use("/", userRouter);
-
-
-
-app.use((req, res, next) => {
-    next(new ExpressError(404, "Page Not Found!"));
-});
-
-app.use((err, req, res, next) => {
-
-    if (res.headersSent) {
-        return next(err);
+async function startServer() {
+    if (!dbUrl) {
+        throw new Error("ATLASDB_URL is missing from .env");
+    }
+    if (!secret) {
+        throw new Error("SECRET is missing from .env");
     }
 
-    let { statusCode = 500, message = "Something went wrong!" } = err;
+    await mongoose.connect(dbUrl);
+    console.log('Connected to MongoDB');
 
-    return res.status(statusCode).render("error", { err });
-});
+    const store = MongoStore.create({
+        client: mongoose.connection.getClient(),
+        touchAfter: 24 * 60 * 60, // time period in seconds
+    });
 
-app.listen(8080, () => {
-    console.log('Server is running on port 8080');
+    store.on("error", function (e) {
+        console.log("SESSION STORE ERROR", e);
+    });
+
+    const sessionOptions = {
+        store,
+        secret,
+        resave: false,
+        saveUninitialized: false,
+        cookie: {
+            httpOnly: true,
+            expires: Date.now() + 1000 * 60 * 60 * 24 * 7, // 1 week
+            maxAge: 1000 * 60 * 60 * 24 * 7
+        },
+    };
+
+    app.use(session(sessionOptions));
+    app.use(flash());
+
+    app.use(passport.initialize());
+    app.use(passport.session());
+    passport.use(new LocalStrategy(User.authenticate()));
+
+    passport.serializeUser(User.serializeUser());
+    passport.deserializeUser(User.deserializeUser());
+
+    app.use((req, res, next) => {
+        res.locals.success = req.flash('success');
+        // console.log(res.locals.success);
+        res.locals.error = req.flash('error');
+        res.locals.currUser = req.user;
+        next();
+    });
+
+    // app.get('/demoUser', async (req, res) => {
+    //     const user = new User({
+    //         email: 'demo@example.com',
+    //         username: 'demoUser'
+    //     });
+    //     let registeredUser = await User.register(user, 'helloworld');
+    //     res.send(registeredUser);
+    // });
+
+    app.use("/listings", listingRouter);
+    app.use("/listings/:id/reviews", reviewRouter);
+    app.use("/", userRouter);
+
+    app.use((req, res, next) => {
+        next(new ExpressError(404, "Page Not Found!"));
+    });
+
+    app.use((err, req, res, next) => {
+
+        if (res.headersSent) {
+            return next(err);
+        }
+
+        let { statusCode = 500, message = "Something went wrong!" } = err;
+
+        return res.status(statusCode).render("error", { err });
+    });
+
+    app.listen(8080, () => {
+        console.log('Server is running on port 8080');
+    });
+}
+
+startServer().catch((err) => {
+    console.error('Failed to start server:', err);
+    process.exit(1);
 });
