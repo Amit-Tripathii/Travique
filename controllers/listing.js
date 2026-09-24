@@ -37,18 +37,27 @@ module.exports.createListing = async (req, res) => {
 
   // Geocoding
   const location = req.body.listing.location;
+  const country = req.body.listing.country;
 
   const response = await axios.get(
     "https://maps.googleapis.com/maps/api/geocode/json",
     {
       params: {
-        address: `${req.body.listing.location}, ${req.body.listing.country}`,
+        address: `${location}, ${country}`,
         key: process.env.MAP_TOKEN,
       },
     },
   );
-  if (!response.data.results.length) {
-    req.flash("error", "Invalid location entered!");
+
+  console.log("Geocoding status:", response.data.status);
+  console.log("Geocoding error:", response.data.error_message);
+  console.log("Geocoding results:", response.data.results.length);
+
+  if (response.data.status !== "OK" || !response.data.results.length) {
+    req.flash(
+      "error",
+      response.data.error_message || "Invalid location entered!",
+    );
     return res.redirect("/listings/new");
   }
 
