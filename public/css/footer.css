@@ -1,0 +1,100 @@
+/* =========================
+   TRAVIQUE FOOTER
+   ========================= */
+
+footer {
+    margin-top: auto;
+}
+
+.f-info {
+    min-height: 8rem;
+    padding: 1.5rem 2rem;
+    background-color: #f7f7f7;
+
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+
+    border-top: 1px solid #eeeeee;
+}
+
+/* Social icons */
+
+.f-info-socials {
+    width: 100%;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    gap: 1rem;
+}
+
+.f-info-socials a {
+    color: #222;
+    font-size: 1.25rem;
+
+    transition: color 0.2s ease,
+                transform 0.2s ease;
+}
+
+.f-info-socials a:hover {
+    color: #fe424d;
+    transform: translateY(-2px);
+}
+
+/* Copyright */
+
+.f-info-brand {
+    width: 100%;
+
+    text-align: center;
+
+    color: #555;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+/* Footer links */
+
+.f-info-links {
+    width: 100%;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    gap: 1.5rem;
+}
+
+.f-info-links a {
+    color: #555;
+    text-decoration: none;
+
+    font-size: 0.9rem;
+    transition: color 0.2s ease;
+}
+
+.f-info-links a:hover {
+    color: #fe424d;
+    text-decoration: underline;
+}
+
+/* Mobile */
+
+@media (max-width: 576px) {
+
+    .f-info {
+        padding: 1.5rem 1rem;
+        gap: 0.8rem;
+    }
+
+    .f-info-socials {
+        gap: 1.2rem;
+    }
+
+    .f-info-links {
+        gap: 1rem;
+    }
+}

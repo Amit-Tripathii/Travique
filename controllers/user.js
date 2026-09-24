@@ -1,54 +1,53 @@
 const User = require("../models/user.js");
 
 module.exports.renderSignupForm = (req, res) => {
-    return res.render("users/signup");
+  return res.render("users/signup");
 };
 
 module.exports.signup = async (req, res, next) => {
-    try {
-        let { username, email, password } = req.body;
+  try {
+    let { username, email, password } = req.body;
 
-        const newUser = new User({ username, email });
+    const newUser = new User({ username, email });
 
-        const registeredUser = await User.register(newUser, password);
+    const registeredUser = await User.register(newUser, password);
 
-        req.login(registeredUser, (err) => {
-            if (err) {
-                return next(err);
-            }
+    req.login(registeredUser, (err) => {
+      if (err) {
+        return next(err);
+      }
 
-            req.flash("success", "Welcome to Travique!");
+      req.flash("success", "Welcome to Travique!");
 
-            return res.redirect("/listings");
-        });
+      return res.redirect("/listings");
+    });
+  } catch (e) {
+    req.flash("error", e.message);
 
-    } catch (e) {
-        req.flash("error", e.message);
-
-        return res.redirect("/signup");
-    }
+    return res.redirect("/signup");
+  }
 };
 
 module.exports.renderLoginForm = (req, res) => {
-    return res.render("users/login");
+  return res.render("users/login");
 };
 
 module.exports.login = async (req, res) => {
-    req.flash("success", "Welcome back! You are now logged in!");
+  req.flash("success", "Welcome back! You are now logged in!");
 
-    let redirectUrl = res.locals.redirectUrl || "/listings";
+  let redirectUrl = res.locals.redirectUrl || "/listings";
 
-    return res.redirect(redirectUrl);
+  return res.redirect(redirectUrl);
 };
 
 module.exports.logout = (req, res, next) => {
-    req.logout((err) => {
-        if (err) {
-            return next(err);
-        }
+  req.logout((err) => {
+    if (err) {
+      return next(err);
+    }
 
-        req.flash("success", "You have been logged out!");
+    req.flash("success", "You have been logged out!");
 
-        return res.redirect("/listings");
-    });
+    return res.redirect("/listings");
+  });
 };

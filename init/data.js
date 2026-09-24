@@ -28,7 +28,7 @@ const sampleListings = [
     country: "United States",
     geometry: {
       type: "Point",
-      coordinates: [-74.0060, 40.7128],
+      coordinates: [-74.006, 40.7128],
     },
   },
   {
@@ -140,7 +140,7 @@ const sampleListings = [
     country: "Switzerland",
     geometry: {
       type: "Point",
-      coordinates: [7.2282, 46.0960],
+      coordinates: [7.2282, 46.096],
     },
   },
   {
@@ -188,7 +188,7 @@ const sampleListings = [
     country: "Fiji",
     geometry: {
       type: "Point",
-      coordinates: [178.0650, -17.7134],
+      coordinates: [178.065, -17.7134],
     },
   },
   {
@@ -204,7 +204,7 @@ const sampleListings = [
     country: "United Kingdom",
     geometry: {
       type: "Point",
-      coordinates: [-1.8433, 51.8330],
+      coordinates: [-1.8433, 51.833],
     },
   },
   {
@@ -300,7 +300,7 @@ const sampleListings = [
     country: "United Kingdom",
     geometry: {
       type: "Point",
-      coordinates: [-4.2026, 57.1200],
+      coordinates: [-4.2026, 57.12],
     },
   },
   {
@@ -348,7 +348,7 @@ const sampleListings = [
     country: "Greece",
     geometry: {
       type: "Point",
-      coordinates: [25.3290, 37.4467],
+      coordinates: [25.329, 37.4467],
     },
   },
   {
